@@ -368,7 +368,7 @@ function roomPage(room) {
     <h3>🔮 Deals &amp; suggestions</h3>
     ${room.deals && room.deals.length ? room.deals.map(d => `
       <div class="deal"><span class="price">${money(d.price)}</span><span><strong>${esc(d.name)}</strong> — ${esc(d.note)} ${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">view ↗</a>` : ""}</span></div>`).join("")
-    : `<div class="deals-empty">The shopping assistant isn't running yet. Once it is, this panel will surface deals and suggestions matched to this room's open buy list and design spec (${room.id === "powder-room" ? "aged brass, green/blue palette" : "TBD"}).<br><br>To turn it on, tell Claude: <strong>“set up the deal watcher.”</strong></div>`}
+    : `<div class="deals-empty">No deals on the board yet. The deal watcher runs every morning at 7:30 and fills this panel with finds matched to this room's open buy list${room.spec.length ? " and design spec" : ""}.</div>`}
   </div>
 
   <div class="panel" id="sync">
