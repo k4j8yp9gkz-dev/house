@@ -124,14 +124,42 @@ window.HQ_DATA = {
       phase: "scoping",
       status: "active",
       targetDate: "2026-11-15",
-      blurb: "Built-ins, paint, wet bar, terrace bath swap. Part of the bundled Jose engagement starting August.",
-      spec: [],
+      blurb: "Built-ins, paint, wet bar, terrace bath refresh (toilet, vanity, lights, heated towel bar, swimsuit rack). Part of the bundled Jose engagement starting August.",
+      spec: [
+        "Terrace bath toilet: ~11\" rough-in (bolts to wall) — needs a 10\" rough-in model, NOT standard 12\"",
+        "Terrace bath: 5'3\" × 13'6\", with shower; vanity swap stays in same footprint",
+        "Terrace bath doubles as pool/swim drop zone — hanging rack for wet bathing suits",
+      ],
       items: [
         {
           id: "bs-toilet",
-          name: "Toilet (terrace bath) — cross-project batch",
+          name: "Toilet (terrace bath) — 10\" rough-in",
           purchased: false, source: "", paid: null, emoji: "🚽",
-          details: "Same batch as the powder room toilet — one model, buy 3+.",
+          details: "Rough-in measures ~11\" bolts-to-wall — standard 12\" models won't fit. Needs 10\" rough-in variant; ideally same line as the powder/Z31 batch so they match.",
+        },
+        {
+          id: "bs-vanity",
+          name: "Vanity (terrace bath)",
+          purchased: false, source: "", paid: null, emoji: "🧺",
+          details: "Same-footprint swap — measure existing width before shopping.",
+        },
+        {
+          id: "bs-bath-lights",
+          name: "Light fixtures (terrace bath)",
+          purchased: false, source: "", paid: null, emoji: "💡",
+          details: "Replacement fixtures; count and style TBD.",
+        },
+        {
+          id: "bs-heated-towel-bar",
+          name: "Heated towel bar (terrace bath)",
+          purchased: false, source: "", paid: null, emoji: "🔥",
+          details: "Hardwired vs. plug-in TBD — hardwired needs the electrician while walls are open; plug-in needs a nearby outlet.",
+        },
+        {
+          id: "bs-swimsuit-rack",
+          name: "Hanging rack for bathing suits (terrace bath)",
+          purchased: false, source: "", paid: null, emoji: "🩱",
+          details: "Wall-mounted, drip-friendly placement (over tile/shower zone ideal).",
         },
         {
           id: "bs-billy",
