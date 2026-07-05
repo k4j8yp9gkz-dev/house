@@ -49,7 +49,7 @@ window.HQ_DATA = {
           id: "pr-vanity",
           name: "Vanity — Aoibhin 30\", Carrara marble top, Royal Blue base",
           purchased: true, source: "Wayfair — order #4675642235", paid: null, emoji: "🧺",
-          details: "In transit, ETA ~Jul 12 (partially shipped — expect two parcels). INSPECT MARBLE TOP IMMEDIATELY on arrival; Wayfair's damage-claim window is short.",
+          details: "In transit, ETA ~Jul 12 (partially shipped — expect two parcels). INSPECT MARBLE TOP IMMEDIATELY on arrival; Wayfair's damage-claim window is short. Also confirm faucet-hole drilling (expected 3-hole 8\" widespread) — the faucet order depends on it.",
         },
         {
           id: "pr-mirror",
@@ -73,7 +73,7 @@ window.HQ_DATA = {
           id: "pr-faucet",
           name: "Faucet — widespread, aged brass + drain assembly + supply lines/valves",
           purchased: false, source: "", paid: null, emoji: "🚰",
-          details: "Confirmed NOT purchased — buy before install day. Widespread style per mockup; match Aged Brass standard. Include drain assembly, supply lines, shutoff valves.",
+          details: "Confirmed NOT purchased — buy before install day. Widespread style per mockup; match Aged Brass standard. Include drain assembly, supply lines, shutoff valves. Order AFTER confirming the vanity top's drilling on arrival (~Jul 12). Kohler Terzet ruled out here (brushed nickel ≠ Aged Brass) — it moved to the terrace bath list.",
         },
         {
           id: "pr-towel-bar",
@@ -141,7 +141,13 @@ window.HQ_DATA = {
           id: "bs-vanity",
           name: "Vanity (terrace bath)",
           purchased: false, source: "", paid: null, emoji: "🧺",
-          details: "Same-footprint swap — measure existing width before shopping.",
+          details: "Same-footprint swap — measure existing width before shopping. Candidate: Home Depot Hampton Harbor 48\" W × 22\" D, white w/ white marble top (#205342414) — pre-drilled 3-hole 8\" widespread. Verify 48\" fits the measured footprint.",
+        },
+        {
+          id: "bs-faucet",
+          name: "Faucet (terrace bath) — 8\" widespread",
+          purchased: false, source: "", paid: null, emoji: "🚰",
+          details: "Must match the vanity top's drilling. Candidate: Kohler Terzet widespread, brushed nickel (Costco #4000287300) — fits 8\"–16\" centers, includes drain, matches Hampton Harbor hardware. Alternates: Delta Rinna WIDESPREAD (Costco #4000339320); Delta Porter / Pierce / Lahara (Home Depot). Centerset (4\") faucets do NOT fit a widespread top.",
         },
         {
           id: "bs-bath-lights",
