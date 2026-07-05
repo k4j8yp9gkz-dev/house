@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Our House — Master Record</title>
+<style>
+  :root {
+    --bg: #f7f3ec;
+    --card: #fffdf8;
+    --ink: #2b2622;
+    --ink-soft: #6f665c;
+    --line: #e6ddd0;
+    --accent: #2e6b4f;
+    --brass: #b08d3f;
+    --danger: #a33d2e;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(60,50,35,.06), 0 6px 18px rgba(60,50,35,.07);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding-bottom: 48px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+  a { color: inherit; }
+
+  /* ---------- header ---------- */
+  .masthead { padding: 28px 0 10px; }
+  .masthead h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(28px, 5vw, 40px); margin: 0; letter-spacing: -.5px;
+  }
+  .masthead .sub { color: var(--ink-soft); margin-top: 4px; }
+  .crumb {
+    display: inline-block; margin: 18px 0 0; color: var(--ink-soft);
+    text-decoration: none; font-size: 14px; font-weight: 600;
+  }
+  .crumb:hover { color: var(--ink); }
+  .pill {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .3px;
+    padding: 3px 10px; border-radius: 999px; text-transform: uppercase;
+  }
+  .pill.brass { background: #f3e8cf; color: #7c5f1e; }
+  .pill.phase { background: #e8efe9; color: #2e6b4f; }
+  .pill.waiting { background: #f5e8e0; color: #a05a3a; }
+  .pill.dirty { background: #fdeae2; color: var(--danger); cursor: pointer; border: 0; }
+
+  /* ---------- stat strip ---------- */
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 8px; }
+  .stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 18px; box-shadow: var(--shadow); flex: 1 1 140px; min-width: 140px;
+  }
+  .stat .num { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .stat .lbl { font-size: 12px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .4px; }
+
+  /* ---------- room cards (landing) ---------- */
+  .rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 18px; }
+  .room-card {
+    display: block; text-decoration: none; background: var(--card);
+    border: 1px solid var(--line); border-left: 5px solid var(--accent);
+    border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow);
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .room-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(60,50,35,.09), 0 10px 24px rgba(60,50,35,.10); }
+  .room-card .top { display: flex; align-items: baseline; gap: 10px; }
+  .room-card .emoji { font-size: 26px; }
+  .room-card h2 { font-size: 18px; margin: 0; flex: 1; }
+  .room-card .zone { font-size: 12px; color: var(--ink-soft); }
+  .room-card .blurb { font-size: 13.5px; color: var(--ink-soft); margin: 8px 0 12px; }
+  .meter { height: 7px; background: #eee5d6; border-radius: 99px; overflow: hidden; }
+  .meter > div { height: 100%; background: var(--accent); border-radius: 99px; }
+  .room-card .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12.5px; color: var(--ink-soft); }
+
+  /* ---------- room page ---------- */
+  .room-head { display: flex; align-items: center; gap: 14px; margin: 10px 0 4px; flex-wrap: wrap; }
+  .room-head .emoji { font-size: 40px; }
+  .room-head h1 { font-family: Georgia, serif; font-size: clamp(24px, 4.5vw, 34px); margin: 0; }
+  .room-meta { color: var(--ink-soft); font-size: 14px; margin-bottom: 14px; }
+
+  .panel {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 16px; margin: 14px 0;
+  }
+  .panel h3 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .6px; color: var(--ink-soft); }
+  .spec-list { margin: 0; padding-left: 18px; font-size: 14.5px; }
+  .spec-list li { margin: 4px 0; }
+
+  .budget-row { display: flex; gap: 20px; flex-wrap: wrap; align-items: baseline; }
+  .budget-row .big { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .budget-row .cap { font-size: 12px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .4px; }
+  .linkish { background: none; border: none; padding: 0; color: var(--brass); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+  /* ---------- filters ---------- */
+  .filters { display: flex; gap: 8px; margin: 16px 0 10px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--line); background: var(--card); border-radius: 999px;
+    padding: 6px 14px; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink-soft);
+  }
+  .chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* ---------- item matrix ---------- */
+  .matrix-head {
+    display: grid; grid-template-columns: 64px 1fr 170px 110px 56px; gap: 12px;
+    padding: 6px 14px; font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px; color: var(--ink-soft);
+  }
+  .item-row {
+    display: grid; grid-template-columns: 64px 1fr 170px 110px 56px; gap: 12px;
+    align-items: center; background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 12px 14px; margin: 8px 0; box-shadow: var(--shadow);
+  }
+  .item-row.bought { background: #f4f6f0; }
+  .item-row.bought .item-name { color: var(--ink-soft); }
+  .thumb {
+    width: 64px; height: 64px; border-radius: 10px; overflow: hidden; flex: none;
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, #fff), color-mix(in srgb, var(--accent) 38%, #fff));
+    border: 1px solid var(--line); cursor: pointer;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .item-name { font-weight: 700; font-size: 15px; }
+  .item-details { font-size: 13px; color: var(--ink-soft); margin-top: 3px; white-space: pre-wrap; }
+  .cell-label { display: none; }
+  .editable { cursor: text; border-bottom: 1px dashed transparent; min-height: 1.2em; }
+  .editable:hover { border-bottom-color: var(--brass); }
+  .editable.empty { color: #b9ae9f; font-style: italic; }
+  .src { font-size: 13.5px; overflow-wrap: anywhere; }
+  .paid { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+  .checkwrap { display: flex; justify-content: center; }
+  .checkbox {
+    width: 34px; height: 34px; border-radius: 10px; border: 2px solid #cfc4b2;
+    background: #fff; cursor: pointer; font-size: 20px; line-height: 1; color: #fff;
+    display: flex; align-items: center; justify-content: center; transition: all .12s ease;
+  }
+  .checkbox.on { background: var(--accent); border-color: var(--accent); }
+  .checkbox:active { transform: scale(.92); }
+  .row-x { border: none; background: none; color: #c4b8a6; font-size: 16px; cursor: pointer; padding: 2px 6px; }
+  .row-x:hover { color: var(--danger); }
+  .edit-input {
+    width: 100%; font: inherit; font-size: 13.5px; padding: 4px 6px;
+    border: 1px solid var(--brass); border-radius: 6px; background: #fffdf4;
+  }
+  textarea.edit-input { resize: vertical; min-height: 56px; }
+
+  .add-btn {
+    width: 100%; padding: 12px; margin-top: 6px; border-radius: var(--radius);
+    border: 2px dashed #d8ccb8; background: none; color: var(--ink-soft);
+    font: inherit; font-weight: 700; cursor: pointer;
+  }
+  .add-btn:hover { border-color: var(--brass); color: var(--brass); }
+
+  .empty-room { text-align: center; color: var(--ink-soft); padding: 26px 10px; font-size: 14.5px; }
+
+  /* ---------- deals ---------- */
+  .deals-empty {
+    border: 2px dashed #d8ccb8; border-radius: var(--radius); padding: 18px;
+    color: var(--ink-soft); font-size: 14px; text-align: center;
+  }
+  .deal { display: flex; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .deal:last-child { border-bottom: none; }
+  .deal .price { font-weight: 800; color: var(--accent); white-space: nowrap; }
+
+  /* ---------- sync ---------- */
+  .sync-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    font: inherit; font-size: 14px; font-weight: 700; padding: 9px 16px;
+    border-radius: 10px; border: 1px solid var(--line); background: var(--ink);
+    color: #fff; cursor: pointer;
+  }
+  .btn.ghost { background: var(--card); color: var(--ink-soft); }
+  .sync-out {
+    white-space: pre-wrap; font: 12.5px/1.5 ui-monospace, Menlo, monospace;
+    background: #f2ede2; border-radius: 10px; padding: 12px; margin-top: 12px;
+    max-height: 320px; overflow: auto;
+  }
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px;
+    font-size: 14px; font-weight: 600; box-shadow: var(--shadow); z-index: 50;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ---------- phone layout ---------- */
+  @media (max-width: 719px) {
+    .matrix-head { display: none; }
+    .item-row {
+      grid-template-columns: 64px 1fr 44px;
+      grid-template-areas:
+        "thumb main check"
+        "meta  meta meta";
+      align-items: start;
+    }
+    .thumb { grid-area: thumb; }
+    .cell-main { grid-area: main; }
+    .checkwrap { grid-area: check; align-self: start; }
+    .cell-meta {
+      grid-area: meta; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 2px;
+    }
+    .cell-label { display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #b0a493; }
+    .paid { text-align: left; }
+  }
+  @media (min-width: 720px) {
+    .cell-meta { display: contents; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+"use strict";
+const KEY = "houseHQ.v1";
+const BASE = window.HQ_DATA;
+
+// ---------- local state (browser-only overlay on top of data.js) ----------
+let state = { overrides: {}, added: {}, budgets: {} };
+try { state = Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+let filter = "all"; // all | tobuy | bought
+
+// ---------- helpers ----------
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = n => (n == null || n === "" || isNaN(n)) ? "—" : "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const parseMoney = s => { const n = parseFloat(String(s).replace(/[$,\s]/g, "")); return isNaN(n) ? null : n; };
+
+function roomById(id) { return BASE.rooms.find(r => r.id === id); }
+function baseItem(id) { for (const r of BASE.rooms) { const it = r.items.find(i => i.id === id); if (it) return it; } return null; }
+
+// effective item = base item + local overrides
+function eff(item) { return Object.assign({}, item, state.overrides[item.id] || {}); }
+function roomItems(room) {
+  const added = (state.added[room.id] || []);
+  return room.items.map(eff).concat(added.map(eff));
+}
+function isAdded(id) { return Object.values(state.added).some(list => list.some(i => i.id === id)); }
+
+function setField(itemId, field, value) {
+  // added items are edited in place; base items get an override entry
+  for (const list of Object.values(state.added)) {
+    const it = list.find(i => i.id === itemId);
+    if (it) { it[field] = value; save(); return; }
+  }
+  state.overrides[itemId] = state.overrides[itemId] || {};
+  state.overrides[itemId][field] = value;
+  save();
+}
+
+function dirtyCount() {
+  let n = Object.keys(state.overrides).length;
+  for (const list of Object.values(state.added)) n += list.length;
+  return n;
+}
+
+function roomStats(room) {
+  const items = roomItems(room);
+  const bought = items.filter(i => i.purchased);
+  const spent = bought.reduce((s, i) => s + (Number(i.paid) || 0), 0);
+  return { total: items.length, bought: bought.length, spent, budget: state.budgets[room.id] ?? null };
+}
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+// ---------- rendering ----------
+const app = document.getElementById("app");
+
+function render() {
+  const m = location.hash.match(/^#\/room\/([\w-]+)/);
+  const room = m && roomById(m[1]);
+  app.innerHTML = room ? roomPage(room) : landing();
+  window.scrollTo(0, 0);
+}
+
+function dirtyPill() {
+  const n = dirtyCount();
+  return n ? `<button class="pill dirty" onclick="jumpToSync()">${n} unsynced change${n > 1 ? "s" : ""} — tell Claude</button>` : "";
+}
+
+function landing() {
+  let spent = 0, bought = 0, total = 0, toBuy = 0;
+  for (const r of BASE.rooms) {
+    const s = roomStats(r);
+    spent += s.spent; bought += s.bought; total += s.total; toBuy += (s.total - s.bought);
+  }
+  return `
+  <header class="masthead">
+    <h1>🏡 ${esc(BASE.house.name)}</h1>
+    <div class="sub">${esc(BASE.house.tagline)} · <span class="pill brass">target: ${esc(BASE.house.target)}</span> ${dirtyPill()}</div>
+  </header>
+  <div class="stats">
+    <div class="stat"><div class="num">${money(spent)}</div><div class="lbl">Logged spend</div></div>
+    <div class="stat"><div class="num">${bought}/${total}</div><div class="lbl">Items purchased</div></div>
+    <div class="stat"><div class="num">${toBuy}</div><div class="lbl">Still to buy</div></div>
+    <div class="stat"><div class="num">${BASE.rooms.length}</div><div class="lbl">Projects</div></div>
+  </div>
+  <div class="rooms">
+    ${BASE.rooms.map(r => {
+      const s = roomStats(r);
+      const pct = s.total ? Math.round(100 * s.bought / s.total) : 0;
+      return `
+      <a class="room-card" href="#/room/${r.id}" style="--accent:${r.accent}">
+        <div class="top"><span class="emoji">${r.emoji}</span><h2>${esc(r.name)}</h2><span class="zone">${esc(r.zone)}</span></div>
+        <div class="blurb">${esc(r.blurb)}</div>
+        <div class="meter"><div style="width:${pct}%"></div></div>
+        <div class="foot">
+          <span>${s.total ? `${s.bought}/${s.total} purchased · ${money(s.spent)}` : "no items yet"}</span>
+          <span class="pill ${r.status === "waiting" ? "waiting" : "phase"}">${esc(r.phase)}</span>
+        </div>
+      </a>`;
+    }).join("")}
+  </div>`;
+}
+
+function roomPage(room) {
+  const s = roomStats(room);
+  let items = roomItems(room);
+  if (filter === "tobuy") items = items.filter(i => !i.purchased);
+  if (filter === "bought") items = items.filter(i => i.purchased);
+
+  return `
+  <a class="crumb" href="#/">← Our House</a>
+  <div class="room-head" style="--accent:${room.accent}">
+    <span class="emoji">${room.emoji}</span>
+    <h1>${esc(room.name)}</h1>
+    <span class="pill ${room.status === "waiting" ? "waiting" : "phase"}">${esc(room.phase)}</span>
+    ${dirtyPill()}
+  </div>
+  <div class="room-meta">${esc(room.zone)}${room.targetDate ? " · target " + esc(room.targetDate) : ""} — ${esc(room.blurb)}</div>
+
+  ${room.spec.length ? `
+  <div class="panel" style="--accent:${room.accent}">
+    <h3>Selections &amp; design spec</h3>
+    <ul class="spec-list">${room.spec.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+  </div>` : ""}
+
+  <div class="panel">
+    <h3>Budget</h3>
+    <div class="budget-row">
+      <div><div class="big">${money(s.spent)}</div><div class="cap">Spent (logged)</div></div>
+      <div><div class="big">${s.budget != null ? money(s.budget) : "—"}</div><div class="cap">Budget <button class="linkish" onclick="editBudget('${room.id}')">${s.budget != null ? "edit" : "set"}</button></div></div>
+      ${s.budget != null ? `<div><div class="big" style="color:${s.budget - s.spent < 0 ? "var(--danger)" : "var(--accent)"}">${money(s.budget - s.spent)}</div><div class="cap">Remaining</div></div>` : ""}
+      <div><div class="big">${s.bought}/${s.total}</div><div class="cap">Purchased</div></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    ${[["all", "All"], ["tobuy", "To buy"], ["bought", "Purchased"]].map(([k, lbl]) =>
+      `<button class="chip ${filter === k ? "on" : ""}" onclick="setFilter('${k}')">${lbl}</button>`).join("")}
+  </div>
+
+  <div class="matrix-head"><span>Photo</span><span>Item</span><span>Source</span><span style="text-align:right">Paid</span><span style="text-align:center">Got it</span></div>
+  ${items.length ? items.map(i => itemRow(room, i)).join("") : `<div class="panel empty-room">No items ${filter !== "all" ? "in this filter" : "yet — add one below, or tell Claude what this room needs"}.</div>`}
+  <button class="add-btn" onclick="addItem('${room.id}')">＋ Add an item</button>
+
+  <div class="panel">
+    <h3>🔮 Deals &amp; suggestions</h3>
+    ${room.deals && room.deals.length ? room.deals.map(d => `
+      <div class="deal"><span class="price">${money(d.price)}</span><span><strong>${esc(d.name)}</strong> — ${esc(d.note)} ${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">view ↗</a>` : ""}</span></div>`).join("")
+    : `<div class="deals-empty">The shopping assistant isn't running yet. Once it is, this panel will surface deals and suggestions matched to this room's open buy list and design spec (${room.id === "powder-room" ? "aged brass, green/blue palette" : "TBD"}).<br><br>To turn it on, tell Claude: <strong>“set up the deal watcher.”</strong></div>`}
+  </div>
+
+  <div class="panel" id="sync">
+    <h3>Sync with Claude</h3>
+    <p style="font-size:14px;color:var(--ink-soft);margin:0 0 12px">
+      Checkmarks and edits save automatically <em>in this browser</em>. To make them part of the permanent
+      record (and appear on other devices), copy the update below and paste it to Claude — it gets merged
+      into the master data and the project files.
+    </p>
+    <div class="sync-actions">
+      <button class="btn" onclick="copySync()">Copy update for Claude${dirtyCount() ? ` (${dirtyCount()})` : ""}</button>
+      <button class="btn ghost" onclick="resetLocal()">Discard my local edits</button>
+    </div>
+    <div class="sync-out" id="sync-out" style="display:none"></div>
+  </div>`;
+}
+
+function itemRow(room, i) {
+  const added = isAdded(i.id);
+  const img = i.image
+    ? `<img src="${esc(i.image)}" alt="" onerror="this.parentNode.textContent='${esc(i.emoji || "📦")}'">`
+    : (i.emoji || "📦");
+  return `
+  <div class="item-row ${i.purchased ? "bought" : ""}" style="--accent:${room.accent}" data-id="${i.id}">
+    <div class="thumb" onclick="setImage('${i.id}')" title="Tap to set a photo URL">${img}</div>
+    <div class="cell-main">
+      <div class="item-name ${added ? "editable" : ""}" ${added ? `onclick="edit(this,'${i.id}','name')"` : ""}>${esc(i.name)}${added ? ` <button class="row-x" onclick="event.stopPropagation();removeAdded('${i.id}')" title="Remove">✕</button>` : ""}</div>
+      <div class="item-details editable ${i.details ? "" : "empty"}" onclick="edit(this,'${i.id}','details',true)">${esc(i.details) || "add details…"}</div>
+    </div>
+    <div class="cell-meta">
+      <div><span class="cell-label">Source</span><div class="src editable ${i.source ? "" : "empty"}" onclick="edit(this,'${i.id}','source')">${esc(i.source) || "add source…"}</div></div>
+      <div><span class="cell-label">Paid</span><div class="paid editable ${i.paid != null ? "" : "empty"}" onclick="edit(this,'${i.id}','paid')">${money(i.paid)}</div></div>
+    </div>
+    <div class="checkwrap">
+      <button class="checkbox ${i.purchased ? "on" : ""}" onclick="togglePurchased('${i.id}')" title="${i.purchased ? "Purchased — tap to undo" : "Tap when purchased"}" aria-label="purchased" aria-pressed="${!!i.purchased}">${i.purchased ? "✓" : ""}</button>
+    </div>
+  </div>`;
+}
+
+// ---------- interactions ----------
+window.setFilter = k => { filter = k; render(); };
+
+window.togglePurchased = id => {
+  const cur = eff(baseItem(id) || findAdded(id));
+  setField(id, "purchased", !cur.purchased);
+  render();
+  toast(!cur.purchased ? "Marked purchased 🎉" : "Un-marked");
+};
+function findAdded(id) { for (const l of Object.values(state.added)) { const it = l.find(i => i.id === id); if (it) return it; } return {}; }
+
+window.edit = (el, id, field, multi) => {
+  if (el.querySelector(".edit-input")) return;
+  const cur = eff(baseItem(id) || findAdded(id));
+  let val = cur[field];
+  if (field === "paid") val = (val == null ? "" : val);
+  const input = document.createElement(multi ? "textarea" : "input");
+  input.className = "edit-input";
+  input.value = val ?? "";
+  el.textContent = ""; el.appendChild(input); input.focus();
+  const done = () => {
+    let v = input.value.trim();
+    if (field === "paid") v = parseMoney(v);
+    if (field === "name" && !v) v = cur.name;
+    setField(id, field, v === "" ? "" : v);
+    render();
+  };
+  input.addEventListener("blur", done);
+  input.addEventListener("keydown", e => { if (e.key === "Enter" && !multi) { e.preventDefault(); input.blur(); } if (e.key === "Escape") { input.removeEventListener("blur", done); render(); } });
+};
+
+window.setImage = id => {
+  const cur = eff(baseItem(id) || findAdded(id));
+  const v = prompt("Photo for this item — paste an image URL, or a path like images/vanity.jpg (drop the file in the site/images folder):", cur.image || "");
+  if (v === null) return;
+  setField(id, "image", v.trim());
+  render();
+};
+
+window.editBudget = roomId => {
+  const cur = state.budgets[roomId];
+  const v = prompt("Room budget (USD):", cur ?? "");
+  if (v === null) return;
+  const n = parseMoney(v);
+  if (n == null) delete state.budgets[roomId]; else state.budgets[roomId] = n;
+  save(); render();
+};
+
+window.addItem = roomId => {
+  const name = prompt("What's the item?");
+  if (!name || !name.trim()) return;
+  state.added[roomId] = state.added[roomId] || [];
+  state.added[roomId].push({
+    id: "new-" + roomId + "-" + (state.added[roomId].length + 1) + "-" + name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 24),
+    name: name.trim(), purchased: false, source: "", paid: null, details: "", emoji: "🆕",
+  });
+  save(); render();
+};
+
+window.removeAdded = id => {
+  for (const [rid, list] of Object.entries(state.added)) {
+    const idx = list.findIndex(i => i.id === id);
+    if (idx >= 0) { list.splice(idx, 1); if (!list.length) delete state.added[rid]; }
+  }
+  save(); render();
+};
+
+window.jumpToSync = () => {
+  const el = document.getElementById("sync");
+  if (el) el.scrollIntoView({ behavior: "smooth" });
+  else toast("Open any room page to sync");
+};
+
+// ---------- sync report ----------
+function syncReport() {
+  const lines = ["HOUSE SITE UPDATE — paste this to Claude to merge into the master record", ""];
+  let any = false;
+  for (const room of BASE.rooms) {
+    const roomLines = [];
+    for (const it of room.items) {
+      const ov = state.overrides[it.id];
+      if (!ov || !Object.keys(ov).length) continue;
+      const parts = [];
+      if ("purchased" in ov && ov.purchased !== it.purchased) parts.push(ov.purchased ? "PURCHASED ✓" : "un-purchased");
+      if ("source" in ov && ov.source !== it.source) parts.push(`source: ${ov.source || "(cleared)"}`);
+      if ("paid" in ov && ov.paid !== it.paid) parts.push(`paid: ${ov.paid == null ? "(cleared)" : money(ov.paid)}`);
+      if ("details" in ov && ov.details !== it.details) parts.push(`details: ${ov.details || "(cleared)"}`);
+      if ("image" in ov && ov.image !== it.image) parts.push(`image: ${ov.image || "(cleared)"}`);
+      if (parts.length) roomLines.push(`  • ${it.name} → ${parts.join(" | ")}`);
+    }
+    for (const it of (state.added[room.id] || [])) {
+      roomLines.push(`  • NEW ITEM: ${it.name}${it.purchased ? " [purchased]" : ""}${it.source ? ` | source: ${it.source}` : ""}${it.paid != null ? ` | paid: ${money(it.paid)}` : ""}${it.details ? ` | ${it.details}` : ""}`);
+    }
+    if (state.budgets[room.id] != null) roomLines.push(`  • budget set: $${state.budgets[room.id]}`);
+    if (roomLines.length) { any = true; lines.push(`${room.name}:`, ...roomLines, ""); }
+  }
+  if (!any) lines.push("(no local changes — everything matches the master record)");
+  return lines.join("\n");
+}
+
+window.copySync = async () => {
+  const txt = syncReport();
+  const out = document.getElementById("sync-out");
+  out.style.display = "block"; out.textContent = txt;
+  try { await navigator.clipboard.writeText(txt); toast("Copied — paste it to Claude"); }
+  catch (e) { toast("Copy blocked — select the text below"); }
+};
+
+window.resetLocal = () => {
+  if (!confirm("Discard all local edits and go back to the master record?")) return;
+  state = { overrides: {}, added: {}, budgets: {} };
+  save(); render(); toast("Local edits discarded");
+};
+
+window.addEventListener("hashchange", () => { filter = "all"; render(); });
+render();
+</script>
+</body>
+</html>
